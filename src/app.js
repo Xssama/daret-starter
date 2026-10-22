@@ -202,8 +202,65 @@ function RemoveParticipantEventhandler(event)
         document.getElementById('participants-compteur').textContent = (participatsCount - 1) + " participants"
     }
 }
+
+function CercleResume(cotisation, nbparticipants,Periodicite, strStartDate)
+{
+
+    let resume = {
+        total_verse : 0,
+        totalPaidPerPerson: 0,
+        nbTours: 0,
+        startdate: new Date(strStartDate),
+        enddate: new Date(strStartDate),
+    }
+    resume.total_verse = cotisation * nbparticipants
+    resume.totalPaidPerPerson = cotisation * nbparticipants
+    resume.nbTours = nbparticipants
+    
+    console.log(resume.startdate);
     
 
+    if (Periodicite === "hebdomadaire") {
+        resume.enddate.setDate(resume.startdate.getDate() + (7 * (nbparticipants - 1)))
+    }
+    else if (Periodicite === "quinzaine")
+    {
+        resume.enddate.setDate(resume.startdate.getDate() + (14 * (nbparticipants - 1)))
+    }
+    else if (Periodicite === "mensuelle")
+    {
+        resume.enddate.setMonth(resume.startdate.getMonth() + (nbparticipants - 1))
+
+    }
+    return resume
+}
+
+function afficherCercleResume(event)
+{
+    
+    let cotisation = document.getElementById('cotisation').value
+    let nbparticipants = document.getElementById('participants-liste').childElementCount
+    let strstartdate = document.getElementById('date-debut').value
+    let periodicite = document.getElementById('periodicite').value
+    
+    console.log(strstartdate);
+    
+
+    let object = CercleResume(cotisation, nbparticipants, periodicite, strstartdate)
+    let resume_cagnotte = document.getElementById('resume-cagnotte')
+    let resumeTotalCycle = document.getElementById('resume-total-cycle')
+    let resume_nb_tours = document.getElementById('resume-nb-tours')
+    let resume_dates = document.getElementById('resume-dates')
+
+    let contenuResultat = document.getElementById('contenu-resultat')
+    contenuResultat.classList.remove("hidden") 
+    
+    resume_cagnotte.textContent = object.totalPaidPerPerson
+    resumeTotalCycle.textContent = object.total_verse
+    resume_nb_tours.textContent = object.nbTours 
+    resume_dates.textContent = object.startdate.toLocaleDateString() + " | " + object.enddate.toLocaleDateString()
+    event.preventDefault()
+}
 let ajouter_participannts_button = document.getElementById('ajouter-participant')
 ajouter_participannts_button.addEventListener('click', AjouterParticipantEventHandler)
 let participantsliste = document.getElementById("participants-liste")
@@ -214,3 +271,4 @@ AjouterParticipantEventHandler()
 
 
 
+daret_formulaire.addEventListener('submit', afficherCercleResume)
