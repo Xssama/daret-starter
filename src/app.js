@@ -1,6 +1,6 @@
 // Daret — simulateur. Ton code commence ici.
 // Le HTML (index.html) est déjà intégré : lis-le, repère les id et les data-*, puis fais-le vivre.
-
+let ParticipantsCompteur = 0
 let daret_formulaire = document.getElementById('daret-form')
 
 function isNameValid(nom)
@@ -42,15 +42,15 @@ function ValidateNameField(e)
         erreurP.textContent = "Le nom n'est pas valide!"
         erreurP.classList.remove('hidden')
         e.preventDefault()
-        Input.setAttribute('aria-invalid', true)
-        Input.setAttribute('aria-describedby', 'date-debut-erreur')
+        NomCercle.setAttribute('aria-invalid', true)
+        NomCercle.setAttribute('aria-describedby', 'date-debut-erreur')
     }
     else 
     {
         erreurP.textContent = ""
         erreurP.classList.add('hidden')
-        Input.removeAttribute('aria-invalid')
-        Input.removeAttribute('aria-describedby')
+        NomCercle.removeAttribute('aria-invalid')
+        NomCercle.removeAttribute('aria-describedby')
     }
 }
 function ValidateCotisationField(e)
@@ -61,15 +61,15 @@ function ValidateCotisationField(e)
         erreurP.textContent = "Le nombre n'est pas valide! [100 MAD -50000 MAD]"
         erreurP.classList.remove('hidden')
         e.preventDefault()
-        Input.setAttribute('aria-invalid', true)
-        Input.setAttribute('aria-describedby', 'date-debut-erreur')
+        Cotisation.setAttribute('aria-invalid', true)
+        Cotisation.setAttribute('aria-describedby', 'date-debut-erreur')
     }
     else 
     {
         erreurP.textContent = ""
         erreurP.classList.add('hidden')
-        Input.removeAttribute('aria-invalid')
-        Input.removeAttribute('aria-describedby')
+        Cotisation.removeAttribute('aria-invalid')
+        Cotisation.removeAttribute('aria-describedby')
     }
 }
 function ValidatePeriodiciteField(event)
@@ -85,14 +85,14 @@ function ValidatePeriodiciteField(event)
         PeriodiciteErreur.textContent = "la valeur selecter n'est pas valide!"
         PeriodiciteErreur.classList.remove("hidden")
         event.preventDefault()
-        Input.setAttribute('aria-invalid', true)
-        Input.setAttribute('aria-describedby', 'date-debut-erreur')
+        Periodicite.setAttribute('aria-invalid', true)
+        Periodicite.setAttribute('aria-describedby', 'date-debut-erreur')
     }
     else {
         PeriodiciteErreur.textContent = ""
         PeriodiciteErreur.classList.add("hidden")
-        Input.removeAttribute('aria-invalid')
-        Input.removeAttribute('aria-describedby')
+        Periodicite.removeAttribute('aria-invalid')
+        Periodicite.removeAttribute('aria-describedby')
     }
 }
 function ValidateDateField(event)
@@ -121,7 +121,96 @@ function ValidateDateField(event)
 
     }
 }
-daret_formulaire.addEventListener('submit', ValidateDateField)
-daret_formulaire.addEventListener('submit', ValidateNameField)
-daret_formulaire.addEventListener('submit', ValidateCotisationField)
-daret_formulaire.addEventListener('submit', ValidatePeriodiciteField)
+
+function AjouterParticipant(){
+    let participantsliste = document.getElementById('participants-liste')
+    let nouveauElement = document.createElement('li')
+
+    let NameInput = document.createElement('input')
+    NameInput.id = "participant-" + (ParticipantsCompteur +1)
+    NameInput.placeholder = "Prenom"
+   Object.assign(NameInput.style, {
+        border: 'solid 1px green',
+        borderRadius: '10px',
+        width: '70%',
+        padding: '4px'
+    })
+   
+    
+    let RetirerButton = document.createElement('button')
+    RetirerButton.type = 'button'
+    RetirerButton.textContent = "Retirer"
+    RetirerButton.id = "retirer-participant-" + (ParticipantsCompteur +1)
+    ParticipantsCompteur++
+    Object.assign(RetirerButton.style, {
+        border: 'solid 1px green',
+        borderRadius: '10px',
+        width: '25%',
+        color: '#7D0E06',
+    })
+    RetirerButton.classList.add("hover:bg-gray-200")
+    RetirerButton.setAttribute('data-action', 'remove')
+
+    nouveauElement.appendChild(NameInput)
+    nouveauElement.appendChild(RetirerButton)
+    Object.assign(nouveauElement.style, {
+        display: 'flex',
+        gap: '20px',
+    })
+
+    participantsliste.appendChild(nouveauElement)
+    
+}
+
+function AjouterParticipantEventHandler(event)
+{
+    let ParticipantListe = document.getElementById('participants-liste')
+    let ParticipantsCount = ParticipantListe.childElementCount
+    let ErreurP = document.getElementById('participants-erreur')
+    if (ParticipantsCount >= 20) {
+        ErreurP.textContent = "Vous n'avez pas le droint de ajouter plus que 20 participant!"
+        ErreurP.classList.remove('hidden')
+    }
+    else
+    {
+        AjouterParticipant()
+        ErreurP.textContent = ''
+        ErreurP.classList.add('hidden')
+        document.getElementById('participants-compteur').textContent = (ParticipantsCount +1) + " participants"
+    }
+    
+
+}
+
+function RemoveParticipantEventhandler(event)
+{
+       const button = event.target.closest("[data-action='remove']");
+    let participatsCount = document.getElementById('participants-liste').childElementCount
+    let erreurP = document.getElementById('participants-erreur')
+    if (!button) {
+        return;
+    }
+    if (participatsCount <= 2) {
+        erreurP.textContent = "Vous n'avez pas le droint de retirer moins que 2 participant!"
+        erreurP.classList.remove('hidden')
+    }
+    else {
+        const task = button.closest("li");
+        task.remove();
+        erreurP.textContent = ""
+        erreurP.classList.add('hidden')
+        document.getElementById('participants-compteur').textContent = (participatsCount - 1) + " participants"
+    }
+}
+    
+
+let ajouter_participannts_button = document.getElementById('ajouter-participant')
+ajouter_participannts_button.addEventListener('click', AjouterParticipantEventHandler)
+let participantsliste = document.getElementById("participants-liste")
+participantsliste.addEventListener("click", RemoveParticipantEventhandler);
+AjouterParticipantEventHandler()
+AjouterParticipantEventHandler()
+AjouterParticipantEventHandler()
+
+
+
