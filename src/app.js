@@ -6,6 +6,14 @@
 let ParticipantsCompteur = 0
 let daret_formulaire = document.getElementById('daret-form')
 
+//dialog
+let detail_titre = document.getElementById('detail-titre')
+let detail_date = document.getElementById('detail-date')
+let detail_beneficiaire = document.getElementById('detail-beneficiaire')
+let detail_montant = document.getElementById('detail-montant')
+let detail_contributeurs = document.getElementById('detail-contributeurs')
+let detail_fermer = document.getElementById('detail-fermer')
+
 function isNameValid(nom)
 {
     const regex = /[^\p{L}0-9 -]/u
@@ -44,9 +52,10 @@ function ValidateNameField(e)
     if (!isNameValid(NomCercle.value)) {
         erreurP.textContent = "Le nom n'est pas valide!"
         erreurP.classList.remove('hidden')
-        e.preventDefault()
+        //e.preventDefault()
         NomCercle.setAttribute('aria-invalid', true)
         NomCercle.setAttribute('aria-describedby', 'date-debut-erreur')
+        return false
     }
     else 
     {
@@ -54,6 +63,7 @@ function ValidateNameField(e)
         erreurP.classList.add('hidden')
         NomCercle.removeAttribute('aria-invalid')
         NomCercle.removeAttribute('aria-describedby')
+        return true
     }
 }
 function ValidateCotisationField(e)
@@ -63,9 +73,10 @@ function ValidateCotisationField(e)
     if (!isNumberBetween(Cotisation.value, 100, 50000)) {
         erreurP.textContent = "Le nombre n'est pas valide! [100 MAD -50000 MAD]"
         erreurP.classList.remove('hidden')
-        e.preventDefault()
+        //e.preventDefault()
         Cotisation.setAttribute('aria-invalid', true)
         Cotisation.setAttribute('aria-describedby', 'date-debut-erreur')
+        return false
     }
     else 
     {
@@ -73,6 +84,7 @@ function ValidateCotisationField(e)
         erreurP.classList.add('hidden')
         Cotisation.removeAttribute('aria-invalid')
         Cotisation.removeAttribute('aria-describedby')
+        return true
     }
 }
 function ValidatePeriodiciteField(event)
@@ -87,18 +99,21 @@ function ValidatePeriodiciteField(event)
     if (!arr.includes(SelectedOption)) {
         PeriodiciteErreur.textContent = "la valeur selecter n'est pas valide!"
         PeriodiciteErreur.classList.remove("hidden")
-        event.preventDefault()
+       // event.preventDefault()
         Periodicite.setAttribute('aria-invalid', true)
         Periodicite.setAttribute('aria-describedby', 'date-debut-erreur')
+        return false
     }
     else {
         PeriodiciteErreur.textContent = ""
         PeriodiciteErreur.classList.add("hidden")
         Periodicite.removeAttribute('aria-invalid')
         Periodicite.removeAttribute('aria-describedby')
+
+        return true
     }
 }
-function ValidateDateField(event)
+function ValidateDateField()
 {
     let Input = document.getElementById('date-debut')
     let erreurP = document.getElementById('date-debut-erreur')
@@ -113,7 +128,8 @@ function ValidateDateField(event)
         erreurP.classList.remove('hidden')
         Input.setAttribute('aria-invalid', true)
         Input.setAttribute('aria-describedby', 'date-debut-erreur')
-        event.preventDefault()
+        //event.preventDefault()
+        return false;
     }
     else
     {
@@ -121,7 +137,7 @@ function ValidateDateField(event)
         erreurP.classList.add('hidden')
         Input.removeAttribute('aria-invalid')
         Input.removeAttribute('aria-describedby')
-
+        return true;
     }
 }
 
@@ -259,7 +275,7 @@ function afficherCercleResume(event)
     resumeTotalCycle.textContent = object.total_verse
     resume_nb_tours.textContent = object.nbTours 
     resume_dates.textContent = object.startdate.toLocaleDateString() + " | " + object.enddate.toLocaleDateString()
-    event.preventDefault()
+    //event.preventDefault()
 }
 
 function returnParticipantsName()
@@ -310,9 +326,16 @@ function AficherTableauContenu(table)
         
         TableRow.appendChild(Date_du_tour_cell)
 
-        let BeneficiaireCell = document.createElement('td')
-        BeneficiaireCell.textContent = table[index]
-        TableRow.appendChild(BeneficiaireCell)
+        let BeneficaireCell = document.createElement('td')
+        let BeneficaireBtn = document.createElement('button')
+        BeneficaireBtn.type = 'button'
+        BeneficaireBtn.dataset.action = 'Beneficaire-detailles'
+        BeneficaireBtn.textContent = table[index]
+        Object.assign(BeneficaireBtn.style, {
+            textDecoration: 'underline',
+        })
+        BeneficaireCell.appendChild(BeneficaireBtn)
+        TableRow.appendChild(BeneficaireCell)
 
         let MontantRecuCell = document.createElement('td')
         MontantRecuCell.textContent = cotisation * table.length
@@ -340,7 +363,6 @@ function AficherTableauContenu(table)
         let action = document.createElement('td')
         action.appendChild(btnAction)
         TableRow.appendChild(action)
-        console.log(TableRow);
         
         tableBody.appendChild(TableRow)
     }
@@ -399,24 +421,78 @@ function MarqueStatusTermine(event)
 
 }
 
-let table =document.getElementById('calendrier')
-table.addEventListener('click', MarqueStatusTermine)
+function AfficherBeneficaireDetaille(event)
+{
+    let button = event.target.closest("[data-action='Beneficaire-detailles']")
+    if (!button) {
+        return;
+    }
+    let dialog = document.getElementById('detail-tour')
+    let row = button.closest('tr')
 
-let btnSort = document.getElementById('tirage-au-sort')
-let btnReset = document.getElementById('ordre-saisie')
+    detail_titre.textContent = `Tour n° ${row.cells[0].textContent}`
+    detail_date.textContent = row.cells[1].textContent
+    detail_beneficiaire.textContent = row.cells[2].textContent
+    detail_montant.textContent = row.cells[3].textContent
+    
+    let participants = returnParticipantsName()
+    let str = ""
+    for(const participantnom of participants)
+    {
+        str += participantnom + " - "
+    }
+    str = str.slice(0, -1)
+    str = str.slice(0, -1)
 
-btnSort.addEventListener('click', genererCalendrierAleatoire)
-btnReset.addEventListener('click', genererCalendrier)
+    detail_contributeurs.textContent = str
 
-let ajouter_participannts_button = document.getElementById('ajouter-participant')
-ajouter_participannts_button.addEventListener('click', AjouterParticipantEventHandler)
-let participantsliste = document.getElementById("participants-liste")
-participantsliste.addEventListener("click", RemoveParticipantEventhandler);
+    dialog.showModal()
+    detail_fermer.addEventListener('click', () => {
+        dialog.close()
+    })
+}
+daret_formulaire.addEventListener('submit', (event) => {
+    event.preventDefault()
+    let valid = true
+    if (!ValidateNameField()) {
+        valid = false
+    }
+    if (!ValidateCotisationField()) {
+        valid = false
+    }
+    if (!ValidatePeriodiciteField()) {
+        valid = false
+    }
+    if (!ValidateDateField()) {
+        valid = false
+    }
+    console.log(valid);
+    
+    if (valid) {
+        afficherCercleResume()
+        genererCalendrier()
+    }
+}
+
+)
+// let table =document.getElementById('calendrier')
+// //table.addEventListener('click', MarqueStatusTermine)
+// table.addEventListener('click', AfficherBeneficaireDetaille)
+// let btnSort = document.getElementById('tirage-au-sort')
+// let btnReset = document.getElementById('ordre-saisie')
+
+// btnSort.addEventListener('click', genererCalendrierAleatoire)
+// btnReset.addEventListener('click', genererCalendrier)
+
+// let ajouter_participannts_button = document.getElementById('ajouter-participant')
+// ajouter_participannts_button.addEventListener('click', AjouterParticipantEventHandler)
+// let participantsliste = document.getElementById("participants-liste")
+// participantsliste.addEventListener("click", RemoveParticipantEventhandler);
 
 AjouterParticipantEventHandler()
 AjouterParticipantEventHandler()
 AjouterParticipantEventHandler()
 
 
-daret_formulaire.addEventListener('submit', genererCalendrier)
-daret_formulaire.addEventListener('submit', afficherCercleResume)
+// daret_formulaire.addEventListener('submit', genererCalendrier)
+// daret_formulaire.addEventListener('submit', afficherCercleResume)
