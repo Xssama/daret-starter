@@ -320,10 +320,25 @@ function AficherTableauContenu(table)
 
         let StatusCell = document.createElement('td')
         StatusCell.textContent = "A venir"
+        StatusCell.dataset.role = "status"
         TableRow.appendChild(StatusCell)
 
+        let btnAction = document.createElement('button')
+        btnAction.type = 'button'
+        btnAction.dataset.action = "termine"
+        btnAction.textContent = "Termine"
+        Object.assign(btnAction.style, {
+        border: 'solid 1px black',
+        borderRadius: '10px',
+        width: '95%',
+        height: '70%',
+        color: 'green',
+    })
+    btnAction.classList.add('hover:bg-gray-200')
+    btnAction.classList.add('focus:bg-gray-300')
+
         let action = document.createElement('td')
-        action.textContent = "not implemented yet"
+        action.appendChild(btnAction)
         TableRow.appendChild(action)
         console.log(TableRow);
         
@@ -354,6 +369,38 @@ function genererCalendrierAleatoire()
     AficherTableauContenu(participantsnames)
 }
 
+function MarqueStatusTermine(event)
+{
+    console.log('hello world!');
+    
+    const button = event.target.closest("[data-action='termine']");
+    console.log(button);
+    
+    if (!button) {
+        return;
+    }
+    
+    const row = button.closest("tr");
+    const cell = row.querySelector("td[data-role='status']");
+    if (!row.classList.contains('ligne-terminee')) {
+        cell.textContent = 'Termine'
+        row.classList.add('ligne-terminee')
+        button.textContent = 'Annuler'
+
+        
+    }
+    else
+    {
+        cell.textContent = 'A venir'
+        row.classList.remove('ligne-terminee')
+        button.textContent = 'Termine'
+
+    }
+
+}
+
+let table =document.getElementById('calendrier')
+table.addEventListener('click', MarqueStatusTermine)
 
 let btnSort = document.getElementById('tirage-au-sort')
 let btnReset = document.getElementById('ordre-saisie')
