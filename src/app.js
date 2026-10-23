@@ -1,4 +1,7 @@
 // Daret — simulateur. Ton code commence ici.
+
+//const { createElement } = require("react")
+
 // Le HTML (index.html) est déjà intégré : lis-le, repère les id et les data-*, puis fais-le vivre.
 let ParticipantsCompteur = 0
 let daret_formulaire = document.getElementById('daret-form')
@@ -216,8 +219,7 @@ function CercleResume(cotisation, nbparticipants,Periodicite, strStartDate)
     resume.total_verse = cotisation * nbparticipants
     resume.totalPaidPerPerson = cotisation * nbparticipants
     resume.nbTours = nbparticipants
-    
-    console.log(resume.startdate);
+
     
 
     if (Periodicite === "hebdomadaire") {
@@ -243,8 +245,6 @@ function afficherCercleResume(event)
     let strstartdate = document.getElementById('date-debut').value
     let periodicite = document.getElementById('periodicite').value
     
-    console.log(strstartdate);
-    
 
     let object = CercleResume(cotisation, nbparticipants, periodicite, strstartdate)
     let resume_cagnotte = document.getElementById('resume-cagnotte')
@@ -261,14 +261,115 @@ function afficherCercleResume(event)
     resume_dates.textContent = object.startdate.toLocaleDateString() + " | " + object.enddate.toLocaleDateString()
     event.preventDefault()
 }
+
+function returnParticipantsName()
+{
+    let participants = document.getElementById('participants-liste').children
+    let participantsnames = []
+    for (const participant of participants) {
+        const input = participant.querySelector('input').value
+        participantsnames.push(input)
+    }
+    return participantsnames
+}
+
+function AficherTableauContenu(table)
+{
+    let tableBody = document.getElementById('calendrier-corps')
+    const cotisation = document.getElementById('cotisation').value
+    const startdate = new Date(document.getElementById('date-debut').value)
+    const  periodicite = document.getElementById('periodicite').value
+
+    tableBody.replaceChildren()
+    
+    for (let index = 0; index < table.length; index++) {
+        
+        let TableRow = document.createElement('tr')
+
+        let NumberCell= document.createElement('td')
+        NumberCell.textContent = index + 1
+        TableRow.appendChild(NumberCell)
+
+        let Date_du_tour_cell = document.createElement('td')
+
+        if (periodicite === "hebdomadaire")
+        {   
+            Date_du_tour_cell.textContent = startdate.toLocaleDateString()
+            startdate.setDate(startdate.getDate() + 7)
+        }
+        else if (periodicite ===  "quinzaine")
+        {
+            Date_du_tour_cell.textContent = startdate.toLocaleDateString()
+            startdate.setDate(startdate.getDate() + 14)
+        }
+        else
+        {
+            Date_du_tour_cell.textContent = startdate.toLocaleDateString()
+            startdate.setMonth(startdate.getMonth() + 1)
+        }
+        
+        TableRow.appendChild(Date_du_tour_cell)
+
+        let BeneficiaireCell = document.createElement('td')
+        BeneficiaireCell.textContent = table[index]
+        TableRow.appendChild(BeneficiaireCell)
+
+        let MontantRecuCell = document.createElement('td')
+        MontantRecuCell.textContent = cotisation * table.length
+        TableRow.appendChild(MontantRecuCell)
+
+        let StatusCell = document.createElement('td')
+        StatusCell.textContent = "A venir"
+        TableRow.appendChild(StatusCell)
+
+        let action = document.createElement('td')
+        action.textContent = "not implemented yet"
+        TableRow.appendChild(action)
+        console.log(TableRow);
+        
+        tableBody.appendChild(TableRow)
+    }
+}
+
+function genererCalendrier()
+{
+    let participantsnames = returnParticipantsName()
+    AficherTableauContenu(participantsnames)
+}
+
+function genererCalendrierAleatoire()
+{
+    let participantsnames = returnParticipantsName()
+    let temp = 0
+    for (let index = 0; index < 100; index++) {
+        let a = Math.floor(Math.random() * (participantsnames.length))
+        let b = Math.floor(Math.random() * (participantsnames.length))
+        
+        temp = participantsnames[a];
+        participantsnames[a] = participantsnames[b]
+        participantsnames[b] = temp
+
+        
+    }
+    AficherTableauContenu(participantsnames)
+}
+
+
+let btnSort = document.getElementById('tirage-au-sort')
+let btnReset = document.getElementById('ordre-saisie')
+
+btnSort.addEventListener('click', genererCalendrierAleatoire)
+btnReset.addEventListener('click', genererCalendrier)
+
 let ajouter_participannts_button = document.getElementById('ajouter-participant')
 ajouter_participannts_button.addEventListener('click', AjouterParticipantEventHandler)
 let participantsliste = document.getElementById("participants-liste")
 participantsliste.addEventListener("click", RemoveParticipantEventhandler);
+
 AjouterParticipantEventHandler()
 AjouterParticipantEventHandler()
 AjouterParticipantEventHandler()
 
 
-
+daret_formulaire.addEventListener('submit', genererCalendrier)
 daret_formulaire.addEventListener('submit', afficherCercleResume)
