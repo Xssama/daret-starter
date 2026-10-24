@@ -5,7 +5,13 @@
 // Le HTML (index.html) est déjà intégré : lis-le, repère les id et les data-*, puis fais-le vivre.
 let ParticipantsCompteur = 0
 let daret_formulaire = document.getElementById('daret-form')
-
+let participants_liste = document.getElementById('participants-liste')
+let ajouter_participannts_button = document.getElementById('ajouter-participant')
+let reinitialiser = document.getElementById('reinitialiser')
+//table
+let table = document.getElementById('calendrier')
+let tirage_au_sort = document.getElementById('tirage-au-sort')
+let ordre_saisie = document.getElementById('ordre-saisie')
 //dialog
 let detail_titre = document.getElementById('detail-titre')
 let detail_date = document.getElementById('detail-date')
@@ -181,7 +187,7 @@ function AjouterParticipant(){
     
 }
 
-function AjouterParticipantEventHandler(event)
+function AjouterParticipantEventHandler()
 {
     let ParticipantListe = document.getElementById('participants-liste')
     let ParticipantsCount = ParticipantListe.childElementCount
@@ -203,7 +209,7 @@ function AjouterParticipantEventHandler(event)
 
 function RemoveParticipantEventhandler(event)
 {
-       const button = event.target.closest("[data-action='remove']");
+    const button = event.target.closest("[data-action='remove']");
     let participatsCount = document.getElementById('participants-liste').childElementCount
     let erreurP = document.getElementById('participants-erreur')
     if (!button) {
@@ -393,7 +399,6 @@ function genererCalendrierAleatoire()
 
 function MarqueStatusTermine(event)
 {
-    console.log('hello world!');
     
     const button = event.target.closest("[data-action='termine']");
     console.log(button);
@@ -475,24 +480,17 @@ daret_formulaire.addEventListener('submit', (event) => {
 }
 
 )
-// let table =document.getElementById('calendrier')
-// //table.addEventListener('click', MarqueStatusTermine)
-// table.addEventListener('click', AfficherBeneficaireDetaille)
-// let btnSort = document.getElementById('tirage-au-sort')
-// let btnReset = document.getElementById('ordre-saisie')
+participants_liste.addEventListener('click', RemoveParticipantEventhandler)
 
-// btnSort.addEventListener('click', genererCalendrierAleatoire)
-// btnReset.addEventListener('click', genererCalendrier)
 
-// let ajouter_participannts_button = document.getElementById('ajouter-participant')
-// ajouter_participannts_button.addEventListener('click', AjouterParticipantEventHandler)
-// let participantsliste = document.getElementById("participants-liste")
-// participantsliste.addEventListener("click", RemoveParticipantEventhandler);
+ajouter_participannts_button.addEventListener('click', AjouterParticipantEventHandler)
+table.addEventListener('click', MarqueStatusTermine)
+table.addEventListener('click', AfficherBeneficaireDetaille)
+
+tirage_au_sort.addEventListener('click', genererCalendrierAleatoire)
+ordre_saisie.addEventListener('click', genererCalendrier)
+
 
 AjouterParticipantEventHandler()
 AjouterParticipantEventHandler()
 AjouterParticipantEventHandler()
-
-
-// daret_formulaire.addEventListener('submit', genererCalendrier)
-// daret_formulaire.addEventListener('submit', afficherCercleResume)
